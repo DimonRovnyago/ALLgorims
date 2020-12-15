@@ -1,0 +1,313 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+
+
+//сортировка методом Шелла
+void ShellSort(int n, int mass[])
+{
+int i, j, step;
+int tmp;
+for (step = n / 2; step > 0; step /= 2)
+for (i = step; i < n; i++)
+{
+tmp = mass[i];
+for (j = i; j >= step; j -= step)
+{
+if (tmp < mass[j - step])
+mass[j] = mass[j - step];
+else
+break;
+}
+mass[j] = tmp;
+}
+}
+
+void HoaraSort(int mass[], int first, int last)
+{
+
+int i = first, j = last;
+int tmp, x = mass[(first + last) / 2];
+
+do {
+while (mass[i] < x)
+i++;
+while (mass[j] > x)
+j--;
+
+if (i <= j)
+{
+if (i < j)
+{
+//swap(mass[i], mass[j]);
+tmp=mass[i];
+mass[i]=mass[j];
+mass[j]=tmp;
+}
+i++;
+j--;
+}
+} while (i <= j);
+
+if (i < last)
+HoaraSort(mass, i, last);
+if (first < j)
+HoaraSort(mass, first,j);
+}
+
+
+// Процедура для преобразования в двоичную кучу поддерева с корневым узлом i, что является
+// индексом в mass[]. n - размер кучи
+
+void heapify(int mass[], int n, int i)
+{
+int largest = i;
+int tmp;
+// Инициализируем наибольший элемент как корень
+int l = 2*i + 1; // левый = 2*i + 1
+int r = 2*i + 2; // правый = 2*i + 2
+
+// Если левый дочерний элемент больше корня
+if (l < n && mass[l] > mass[largest])
+largest = l;
+
+// Если правый дочерний элемент больше, чем самый большой элемент на данный момент
+if (r < n && mass[r] > mass[largest])
+largest = r;
+
+// Если самый большой элемент не корень
+if (largest != i)
+{
+//swap(mass[i], mass[largest]);
+tmp=mass[i];
+mass[i]=mass[largest];
+mass[largest]=tmp;
+
+// Рекурсивно преобразуем в двоичную кучу затронутое поддерево
+heapify(mass, n, largest);
+}
+}
+
+// Основная функция, выполняющая пирамидальную сортировку
+void HeapSort(int mass[], int n)
+{
+int tmp;
+// Построение кучи (перегруппируем массив)
+for (int i = n / 2 - 1; i >= 0; i--)
+heapify(mass, n, i);
+
+// Один за другим извлекаем элементы из кучи
+for (int i=n-1; i>=0; i--)
+{
+// Перемещаем текущий корень в конец
+//swap(mass[0], mass[i]);
+tmp=mass[0];
+mass[0]=mass[i];
+mass[i]=tmp;
+
+// вызываем процедуру heapify на уменьшенной куче
+heapify(mass, i, 0);
+}
+}
+
+
+/* Function to sort an massay using insertion sort*/
+void InsertionSort(int mass[], int begin, int end)
+{
+// Get the left and the right index of the submassay
+// to be sorted
+int left = begin;// - mass;
+int right = end;// - mass;
+
+for (int i = left+1; i <= right; i++)
+{
+int key = mass[i];
+int j = i-1;
+
+/* Move elements of mass[0..i-1], that are
+greater than key, to one position ahead
+of their current position */
+while (j >= left && mass[j] > key)
+{
+mass[j+1] = mass[j];
+j = j-1;
+}
+mass[j+1] = key;
+}
+
+return;
+}
+
+// A function to partition the massay and return
+// the partition point
+int* Partition(int mass[], int low, int high)
+{
+int pivot = mass[high]; // pivot
+int i = (low - 1); // Index of smaller element
+int tmp;
+for (int j = low; j <= high- 1; j++)
+{
+// If current element is smaller than or
+// equal to pivot
+if (mass[j] <= pivot)
+{
+// increment index of smaller element
+i++;
+
+//swapValue(mass[i], mass[j]);
+tmp = mass[i];
+mass[i]=mass[j];
+mass[j]=tmp;
+}
+}
+//swapValue(mass[i + 1], mass[high]);
+tmp= mass[i+1];
+mass[i+1]=mass[high];
+mass[high]=tmp;
+return (mass + i + 1);
+}
+
+
+// A function that find the middle of the
+// values pointed by the pointers a, b, c
+// and return that pointer
+int MedianOfThree(int a, int b, int c)
+{
+if (a < b && b < c)
+return (b);
+
+if (a < c && c <= b)
+return (c);
+
+if (b <= a && a < c)
+return (a);
+
+if (b < c && c <= a)
+return (c);
+
+if (c <= a && a <b)
+return (a);
+
+if (c <= b && b <= a)
+return (b);
+}
+
+// A Utility function to perform intro sort
+void IntrosortUtil(int mass[], int begin,
+int end, int depthLimit)
+{
+// Count the number of elements
+int size = end - begin;
+int tmp;
+// If partition size is low then do insertion sort
+if (size < 16)
+{
+InsertionSort(mass, begin, end);
+return;
+}
+
+// If the depth is zero
+ 
+use heapsort
+if (depthLimit == 0)
+{
+//int *newmas = mass;
+//newmas=newmas+begin;
+HeapSort(mass, size+1);
+return;
+}
+
+// Else use a median-of-three concept to
+// find a good pivot
+int pivot = MedianOfThree(begin, begin+size/2, end);
+
+// Swap the values pointed by the two pointers
+//swapValue(pivot, end);
+tmp = mass[pivot];
+mass[pivot]=mass[end];
+mass[end] = tmp;
+// Perform Quick Sort
+int * partitionPoint = Partition(mass, begin, end);
+IntrosortUtil(mass, begin, partitionPoint-1, depthLimit - 1);
+IntrosortUtil(mass, partitionPoint + 1, end, depthLimit - 1);
+
+return;
+}
+
+/* Implementation of introsort*/
+void Introsort(int mass[], int begin, int end)
+{
+int depthLimit = 2 * log(end-begin);
+
+// Perform a recursive Introsort
+IntrosortUtil(mass, begin, end, depthLimit);
+
+return;
+}
+
+int main()
+{
+//ввод N
+int N;
+printf("Input N: ");
+scanf_s("%d", &N);
+//выделение памяти под массив
+int* mass;
+int* mass2;
+int* mass3;
+int* mass4;
+mass = (int *)malloc(N * sizeof(int));
+mass2 = (int *)malloc(N * sizeof(int));
+mass3 = (int *)malloc(N * sizeof(int));
+mass4 = (int *)malloc(N * sizeof(int));
+//ввод элементов массива
+printf("The array elements:\n");
+for (int i = 0; i < N; i++)
+{
+mass[i]=rand()%100;
+mass2[i]=mass[i];
+mass3[i]=mass[i];
+mass4[i]=mass[i];
+printf("%d ",mass[i]);
+}
+printf("\n");
+
+// scanf_s("%d", &mass[i]);
+//сортировка методом Шелла
+ShellSort(N, mass);
+//вывод отсортированного массива на экран
+printf("Sorted array by Shellk:\n");
+for (int i = 0; i < N; i++)
+printf("%d ", mass[i]);
+printf("\n");
+//освобождение памяти
+free(mass);
+
+HoaraSort(mass2, 0, N);
+printf("Sorted array by Hoara:\n");
+for (int i = 0; i < N; i++)
+printf("%d ", mass2[i]);
+printf("\n");
+//освобождение памяти
+free(mass2);
+
+HeapSort(mass3, N);
+printf("Sorted array by Heap:\n");
+for (int i = 0; i < N; i++)
+printf("%d ", mass3[i]);
+printf("\n");
+//освобождение памяти
+free(mass3);
+
+
+Introsort(mass4,0, N);
+printf("Sorted array by Introsort:\n");
+for (int i = 0; i < N; i++)
+printf("%d ", mass4[i]);
+printf("\n");
+//освобождение памяти
+free(mass4);
+
+_getch();
+return 0;
+}
